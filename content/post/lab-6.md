@@ -1,8 +1,8 @@
 +++
 Categories = ["lab"]
 Tags = ["concourse", "pipeline"]
-date = "2017-08-29T12:08:22-04:00"
-title = "Lab: Build Pipelines using Concourse.ci"
+date = "2017-11-29T12:08:22-04:00"
+title = "Lab 10: Build Pipelines using Concourse.ci"
 weight = 10
 +++
 
@@ -37,7 +37,7 @@ Prerequisites
 
 5. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
 
-6. AWS Account with S3 Bucket and Concourse in AWS
+6. Github Personal Access Token
 
 
 
@@ -57,18 +57,18 @@ Learn how to
 
 ***
 
-## Part 1: Configure Concourse.CI Server in AWS
+## Part 1: Configure Concourse.CI Server in Google
 
 ### Step 1
-##### Download Fly and Target Concourse CI Server in AWS
+##### Download Fly and Target Concourse CI Server in Google
 
-The Concourse Server in AWS is already configured from an existing AMI for this workshop.
+The Concourse Server in Google is already configured from an existing Concourse installation for this workshop.
 
-   Open a browser window and launch ***https://ci.rick-ross.com/***
+   Open a browser window and launch ***https://ci.google.pcf.cloud/***
 
    The userid/password for this server is
    ```
-      userid: pivotal
+      userid: student-XX
       password: <distributed in the workshop>
    ```
 
@@ -82,9 +82,9 @@ The Concourse Server in AWS is already configured from an existing AMI for this 
 
 Open a cmd/terminal and target the concourse server.
 
-We will call our Concourse CI Server as *```aws```*
+We will call our Concourse CI Server as *```gcp```*
 
-    $ fly -t aws login -c https://ci.rick-ross.com -k
+    $ fly -t gcp login -c https://ci.google.pcf.cloud -k -n student-XX
 
     Use the same userid / password combination.
 
@@ -94,7 +94,7 @@ We will call our Concourse CI Server as *```aws```*
 We have an existing project `flight-school` in a git repo, which we can clone and use for our first pipeline.
 
 ````
-$ git clone https://github.com/rjain-pivotal/flight-school.git
+$ git clone https://github.com/bbyers-pivotal/flight-school.git
 $ cd flight-school
 
 ````
@@ -118,14 +118,14 @@ Now edit the ~/.concourse/flight-school-properties.yml
 Be sure to point to the correct github-uri. The simplest uri to use is the same from the clone command in step 2.
 
 ````
-github-uri: https://github.com/rjain-pivotal/flight-school.git
+github-uri: https://github.com/bbyers-pivotal/flight-school.git
 github-branch: master
-cf-api: https://api.sys.cloud.rick-ross.com
-cf-username: <studentXXX>
+cf-api: https://api.sys.gcp.pcf.cloud
+cf-username: <student-XX>
 cf-password: <password>
-cf-org: <studentXXX>-org
-cf-space: development
-cf-manifest-host: <studentXXX>-flight-school-ci
+cf-org: ObjectPartners
+cf-space: student-XX
+cf-manifest-host: <student-XX>-flight-school-ci
 
 ````
 
@@ -173,7 +173,7 @@ nano manifest.yml
 ````
 
 ````
-name: <student-id>-flight-school
+name: flight-school
 memory: 128M
 random-route: true
 path: .
@@ -187,10 +187,10 @@ path: .
 
 Now you have your pipeline defined, it is ready to be uploaded to the CI Server.
 
-Name your pipeline based on your studentXXX id
+Name your pipeline based on your student-XX id
 
 ````
-$ fly -t aws set-pipeline -p studentXXX-flight-school -c ci/pipeline.yml -l ~/.concourse/flight-school-properties.yml
+$ fly -t gcp set-pipeline -p student-XX-flight-school -c ci/pipeline.yml -l ~/.concourse/flight-school-properties.yml
 ````
 
 
@@ -199,16 +199,16 @@ $ fly -t aws set-pipeline -p studentXXX-flight-school -c ci/pipeline.yml -l ~/.c
 
 Test the tasks manually before you run the whole Pipelines
 ````
-$ fly -t aws execute -c ci/tasks/build.yml
+$ fly -t gcp execute -c ci/tasks/build.yml
 ````
 
 
 ````
-$ fly -t aws pipelines // This will list all the pipelines
+$ fly -t gcp pipelines // This will list all the pipelines
 
-$ fly -t aws unpause-pipeline -p studentXXX-flight-school  // this will unpause the pipeline. You can also press play in the web ui
+$ fly -t gcp unpause-pipeline -p student-XX-flight-school  // this will unpause the pipeline. You can also press play in the web ui
 
-$ fly -t aws trigger-job --job studentXXX-flight-school/test-app
+$ fly -t gcp trigger-job --job student-XX-flight-school/test-app
 ````
 
 
@@ -236,7 +236,7 @@ Select the pipeline from the Web UI and double click on the test-app stage. This
 To delete the pipeline, run the following command:
 
 ````
-$ fly -t aws destroy-pipeline -p studentXXX-flight-school // This will DELETE the pipeline from Concourse
+$ fly -t gcp destroy-pipeline -p student-XX-flight-school // This will DELETE the pipeline from Concourse
 ````
 
 ## Part 2: Running a real world pipeline
@@ -247,42 +247,34 @@ $ fly -t aws destroy-pipeline -p studentXXX-flight-school // This will DELETE th
 1. Clone the git repo which has a sample app PCFDemo with a real world pipeline.
 
     ````
-    https://github.com/rjain-pivotal/PCF-demo
+    https://github.com/bbyers-pivotal/pcf-ers-demo
     ````
 
-2. Change the manifest.yml to in the PCF-demo directory to reflect your studentID
+2. Configure the properties files and assign it to the pipeline
+
+    Copy the concourse-params-clean.yml to your ~/.concourse/pcf-ers-demo-properties.yml
+    Change the cf properties and github properties.
 
     ````
-    applications:
-      name: studentXXX-pcfdemo
-      memory: 512M
-      instances: 1
-      host: studentXXX-pcfdemo
-      path: ./target/pcfdemo.war
-    ````
-3. We have S3 buckets configured to save your artifacts and the IAM user credentials to access the bucket. This will be given during the workshop.
-4. Configure the properties files and assign it to the pipeline
-
-    Copy the pcfdemo-properties-sample.yml to your ~/.concourse/pcfdemo-properties.yml
-    Change the cf properties, github properties and s3 properties.
-
-    ````
-    github-uri: https://github.com/<github-user>/PCF-demo.git
-    github-branch: master
-    s3-access-key-id: SAMPLEDF99FSWEBF9DW9  # AWS or S3 compatible access key id
-    s3-secret-access-key: sampleaxfdpiA98FG8u7ahd08Sdgf8AFG8gh8S0F  # AWS or S3 compatible secret access key
-    s3-endpoint: s3.amazonaws.com
-    s3-bucket-version: studentXXX-pcfdemo-releases
-    s3-bucket-releases: studentXXX-pcfdemo-releases
-    s3-bucket-release-candidates: studentXXX-pcfdemo-release-candidates
-    maven-opts: # -Xms256m -Xmx512m
-    maven-config: # -s path/to/settings.xml
-    cf-api: https://api.sys.cloud.rick-ross.com
-    cf-username: studentXXX
-    cf-password: studentXXX-password
-    cf-org: studentXXX-org
-    cf-space: development
-    cf-manifest-host: studentXXX-pcfdemo-ci
+    GIT_REPO: git@github.com:<github-user>/pcf-ers-demo.git
+    CF_API: https://api.sys.gcp.pcf.cloud
+    CF_DEV_ORG: ObjectPartners
+    CF_DEV_SPACE: student-XX
+    CF_TEST_ORG: ObjectPartners
+    CF_TEST_SPACE: student-XX
+    CF_UAT_ORG: ObjectPartners
+    CF_UAT_SPACE: student-XX
+    CF_PROD_ORG: ObjectPartners
+    CF_PROD_SPACE: student-XX
+    CF_USER: myuser
+    CF_PASS: mypassword
+    GIT_USER: mygituser
+    GIT_ACCESS_TOKEN: mygittoken
+    GIT_RELEASE_REPO: pcf-ers-demo
+    GIT_PRIVATE_KEY: |
+      -----BEGIN RSA PRIVATE KEY-----
+      REPLACEME
+      -----END RSA PRIVATE KEY-----
     ````
 
 
@@ -291,13 +283,13 @@ $ fly -t aws destroy-pipeline -p studentXXX-flight-school // This will DELETE th
 
 
     ````
-    fly -t aws set-pipeline -p studentXXX-pcfdemo -c ci/pipeline.yml -l ~/.concourse/pcfdemo-properties.yml
+    fly -t gcp set-pipeline -p student-XX-pcfdemo -c ci/pipeline.yml -l ~/.concourse/pcf-ers-demo-properties.yml
     ````
 
 6. List all the pipelines
 
     ````
-    fly -t aws pipelines
+    fly -t gcp pipelines
     //targeting https://52.54.77.21
     name                     paused
     student20-flight-school  yes   
@@ -317,10 +309,10 @@ $ fly -t aws destroy-pipeline -p studentXXX-flight-school // This will DELETE th
 
 
 
-8. Call the Ship-it step, Replace the name of the pipeline with your pipeline name
+8. After the pipeline gets to the UAT step, kick off the ship-it job to deploy to production
 
     ````
-    fly -t aws trigger-job -j studentXXX-pcfdemo/ship-it
+    fly -t gcp trigger-job -j student-XX-pcfdemo/ship-it
     ````
 
     Once the complete Pipeline finishes you should be able to see all the steps in green.
@@ -334,10 +326,9 @@ $ fly -t aws destroy-pipeline -p studentXXX-flight-school // This will DELETE th
     cf apps // Get the App Names and URL
     ````
 
-    Open a browser and check the app load. (https://studentXXX-pcfdemo-ci.sys.cloud.rick-ross.com)
+    Open a browser and check the app load. (https://student-XX-pcf-ers-demo-dev.cfapps.gcp.pcf.cloud)
 
-    <img src="/images/concourse-10.png" alt="Concourse CI" style="width: 100%;"/>
-
+  
 
 ## Part 3: Optional Installing Concourse Locally
 
