@@ -9,8 +9,6 @@ Concourse's end goal is to provide an expressive CI system with as few distinct 
 
 Concourse CI decouples your project from your CI's details, and keeping all configuration in declarative files that can be checked into version control.
 
-<img src="/images/concourse-1.png" alt="Concourse CI" style="width: 100%;"/>
-
 Concourse limits itself to three core concepts: tasks, resources, and the jobs that compose them. Interesting features like timed triggers and synchronizing usage of external environments are modeled in terms of these, rather than as layers on top.
 
 With these primitives you can model any pipeline, from simple (unit → integration → deploy → ship) to complex (testing on multiple infrastructures, fanning out and in, etc.).
@@ -23,10 +21,6 @@ Prerequisites
 2. Shelter Pivotal CF Env (non-prod) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
 
 3. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
-
-4. Github Personal Access Token
-
-
 
 
 Steps
@@ -59,13 +53,7 @@ The Concourse Server in Google is already configured from an existing Concourse 
       password: <distributed in the workshop>
    ```
 
-   Download the fly cli from the main web page based on your OS or from the bottom right corner
-
-   <img src="/images/concourse-4.png" alt="Concourse FLY" style="width: 100%;"/>
-
-  OR
-
-   <img src="/images/concourse-9.png" alt="Concourse FLY" style="width: 100%;"/>
+   Download the fly cli from the main web page based on your OS 
 
 Open a cmd/terminal and target the concourse server.
 
