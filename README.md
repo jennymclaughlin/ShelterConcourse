@@ -16,11 +16,9 @@ With these primitives you can model any pipeline, from simple (unit → integrat
 Prerequisites
 --
 
-1. Java SDK 1.7+
+1. Shelter Pivotal CF Env (non-prod) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
 
-2. Shelter Pivotal CF Env (non-prod) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
-
-3. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
+2. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
 
 
 Steps
