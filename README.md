@@ -1,12 +1,3 @@
-+++
-Categories = ["lab"]
-Tags = ["concourse", "pipeline"]
-date = "2017-11-29T12:08:22-04:00"
-title = "Lab 10: Build Pipelines using Concourse.ci"
-weight = 10
-+++
-
-
 ### Goal
 In this workshop, you will learn how to Build Pipelines to for unit testing, staging and production deployment to Cloud Foundry using Concourse.ci
 
@@ -29,15 +20,11 @@ Prerequisites
 
 1. Java SDK 1.7+
 
-2. Pivotal CF Env or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
+2. Shelter Pivotal CF Env (non-prod) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
 
-3. Optional Vagrant (https://vagrantup.com/) to run Concourse locally
+3. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
 
-4. Optional VirtualBox (https://www.virtualbox.org/wiki/Downloads)
-
-5. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
-
-6. Github Personal Access Token
+4. Github Personal Access Token
 
 
 
@@ -238,122 +225,3 @@ To delete the pipeline, run the following command:
 ````
 $ fly -t gcp destroy-pipeline -p student-XX-flight-school // This will DELETE the pipeline from Concourse
 ````
-
-## Part 2: Running a real world pipeline
-
-### Step 6
-##### Configure a multi step pipeline
-
-1. Clone the git repo which has a sample app PCFDemo with a real world pipeline.
-
-    ````
-    https://github.com/bbyers-pivotal/pcf-ers-demo
-    ````
-
-2. Configure the properties files and assign it to the pipeline
-
-    Copy the concourse-params-clean.yml to your ~/.concourse/pcf-ers-demo-properties.yml
-    Change the cf properties and github properties.
-
-    ````
-    GIT_REPO: git@github.com:<github-user>/pcf-ers-demo.git
-    CF_API: https://api.sys.gcp.pcf.cloud
-    CF_DEV_ORG: ObjectPartners
-    CF_DEV_SPACE: student-XX
-    CF_TEST_ORG: ObjectPartners
-    CF_TEST_SPACE: student-XX
-    CF_UAT_ORG: ObjectPartners
-    CF_UAT_SPACE: student-XX
-    CF_PROD_ORG: ObjectPartners
-    CF_PROD_SPACE: student-XX
-    CF_USER: myuser
-    CF_PASS: mypassword
-    GIT_USER: mygituser
-    GIT_ACCESS_TOKEN: mygittoken
-    GIT_RELEASE_REPO: pcf-ers-demo
-    GIT_PRIVATE_KEY: |
-      -----BEGIN RSA PRIVATE KEY-----
-      REPLACEME
-      -----END RSA PRIVATE KEY-----
-    ````
-
-
-
-5. Set the pipeline
-
-
-    ````
-    fly -t gcp set-pipeline -p student-XX-pcfdemo -c ci/pipeline.yml -l ~/.concourse/pcf-ers-demo-properties.yml
-    ````
-
-6. List all the pipelines
-
-    ````
-    fly -t gcp pipelines
-    //targeting https://52.54.77.21
-    name                     paused
-    student20-flight-school  yes   
-    student25-pcfdemo        yes   
-    ````
-
-7. Trigger the pipeline using the Web UI
-
-    Click on the "Burger" button on the top left corner. This will bring up the Pipelines. Click on you pipeline and press play.
-
-    <img src="/images/concourse-7.png" alt="Concourse CI" style="width: 100%;"/>
-
-
-    This will trigger your pipeline. Click on the Unit Test step to see the details.
-
-    <img src="/images/concourse-8.png" alt="Concourse CI" style="width: 100%;"/>
-
-
-
-8. After the pipeline gets to the UAT step, kick off the ship-it job to deploy to production
-
-    ````
-    fly -t gcp trigger-job -j student-XX-pcfdemo/ship-it
-    ````
-
-    Once the complete Pipeline finishes you should be able to see all the steps in green.
-
-    <img src="/images/concourse-3.png" alt="Concourse CI" style="width: 100%;"/>
-
-
-9. Open the app in browser
-
-    ````
-    cf apps // Get the App Names and URL
-    ````
-
-    Open a browser and check the app load. (https://student-XX-pcf-ers-demo-dev.cfapps.gcp.pcf.cloud)
-
-  
-
-## Part 3: Optional Installing Concourse Locally
-
-### Step 7
-##### Configure your Concourse.CI server
-
-If you have a Mac, you can download the Concourse CI server and boot up using vagrant. This step will take some time, you can do this prior to the start of the workshop presentation.
-
-````bash
-$ mkdir ciworkshop
-& cd ciworkshop
-$ vagrant init concourse/lite # creates ./Vagrantfile
-$ vagrant up                  # downloads the box and spins up the VM
-````
-The web server will be running at http://192.168.100.4:8080
-
-Open up the Concourse UI web page, you don't have any pipelines configured. But you can download the fly cli from here. At the right hand bottom, use the links to download the **fly cli**.
-
-If you're on Linux or OS X, you will have to `chmod +x` the downloaded binary and put it in your $PATH
-
-Next, lets target and login to the Concourse server
-
-Locally use this
-````bash
-$ fly -t lite login -c http://192.168.100.4:8080
-````
-
-You can repeat **Part 1** and **Part 2**, but make sure you change the target from `aws` to `lite` in the fly cli commands
