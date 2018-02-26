@@ -16,7 +16,7 @@ With these primitives you can model any pipeline, from simple (unit → integrat
 Prerequisites
 --
 
-1. Shelter Pivotal CF Env (non-prod) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
+1. Brian's CF Env (https://apps.run.pcf.cloud) or Pivotal Web Services Account.  Create a free trial account here [Pivotal Web Services](http://run.pivotal.io/)
 
 2. Fly cli. The fly tool is a command line interface to Concourse, it available when you bring up Concourse
 
@@ -93,7 +93,7 @@ Be sure to point to the correct github-uri. The simplest uri to use is the same 
 ````
 github-uri: https://github.com/bbyers-pivotal/flight-school.git
 github-branch: master
-cf-api: https://api.sys.gcp.pcf.cloud
+cf-api: https://api.run.pcf.cloud
 cf-username: <student-XX>
 cf-password: <password>
 cf-org: ObjectPartners
